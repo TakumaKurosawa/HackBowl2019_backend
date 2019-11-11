@@ -1,0 +1,11 @@
+# Editor Config
+.idea/*
+*.bak
+
+# Binaries
+hack-bowl
+main
+*.exe
+
+# PProf
+cpu.out

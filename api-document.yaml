@@ -1,0 +1,348 @@
+swagger: "2.0"
+info:
+  description: "Hack Bowl API仕様\n"
+  version: "1.0.0"
+  title: "Golang Hack Bowl API"
+host: "localhost:8080"
+tags:
+- name: "auth"
+  description: "認証関連API"
+- name: "user"
+  description: "ユーザ関連API"
+- name: "project"
+  description: "プロジェクト関連API"
+schemes:
+- "http"
+paths:
+  /auth/create:
+    post:
+      tags:
+      - "auth"
+      summary: "ユーザアカウント認証情報作成API"
+      description: "ユーザの認証情報を作成します。\n
+      ユーザ情報をリクエストで受け取り、サーバ内だけで利用するIDと認証用のトークンを生成しデータベースへ保存します。"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Request Body"
+        required: true
+        schema:
+          $ref: "#/definitions/AuthCreateRequest"
+      responses:
+        200:
+          "description": "A successful response."
+          "schema":
+            "$ref": "#/definitions/AuthCreateResponse"
+
+  /login:
+    post:
+      tags:
+      - "auth"
+      summary: "ユーザログインAPI"
+      description: "ユーザの認証処理をします。\n
+      ユーザのメールアドレスとパスワードをリクエストで受け取り、認証用のトークンを返します。"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Request Body"
+        required: true
+        schema:
+          $ref: "#/definitions/AuthLoginRequest"
+      responses:
+        200:
+          "description": "A successful response."
+          "schema":
+            "$ref": "#/definitions/AuthLoginResponse"
+
+
+  /user/get:
+    get:
+      tags:
+      - "user"
+      summary: "ユーザ情報取得API"
+      description: "ユーザ情報を取得します。\n
+      ユーザの認証と特定の処理はリクエストヘッダのx-tokenを読み取ってデータベースに照会をします。"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "x-token"
+        description: "認証トークン"
+        required: true
+        type: "string"
+      responses:
+        200:
+          "description": "A successful response."
+          "schema":
+            "$ref": "#/definitions/UserGetResponse"
+
+  /user/update:
+    post:
+      tags:
+      - "user"
+      summary: "ユーザ情報更新API"
+      description: "ユーザ情報の更新をします。\n
+      初期実装では名前の更新を行います。"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "x-token"
+        description: "認証トークン"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Request Body"
+        required: true
+        schema:
+          $ref: "#/definitions/UserUpdateRequest"
+      responses:
+        200:
+          "description": "A successful response."
+
+  /projects:
+    get:
+      tags:
+      - "project"
+      summary: "プロジェクト一覧情報取得API"
+      description: "プロジェクト一覧情報を取得します。"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          "description": "A successful response."
+          "schema":
+            "$ref": "#/definitions/AllProjectGetResponse"
+
+  /project:
+    get:
+      tags:
+      - "project"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Request Body"
+        required: true
+        schema:
+          $ref: "#/definitions/ProjectGetRequest"
+      summary: "プロジェクト詳細情報取得API"
+      description: "プロジェクト情報を取得します。"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          "description": "A successful response."
+          "schema":
+            "$ref": "#/definitions/ProjectGetResponse"
+
+definitions:
+  AuthCreateRequest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "ユーザ名"
+        example: "黒澤拓磨"
+      email:
+        type: "string"
+        description: "メールアドレス"
+        example: "example@example.com"
+      password:
+        type: "string"
+        description: "パスワード"
+        example: "heoerei32--kkk"
+  AuthCreateResponse:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+        description: "クライアント側で保存するトークン"
+        example: "HHEkoidkkwoo=--kfjdkfjdkeLKk387r8"
+
+  AuthLoginRequest:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        description: "メールアドレス"
+        example: "example@example.com"
+      password:
+        type: "string"
+        description: "パスワード"
+        example: "hogheoghoeikdkowiekJEKKEKke839920"
+  AuthLoginResponse:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+        description: "クライアント側で保存するトークン"
+        example: "Kk)32kkelkkfdajkljO9249090jfdsk"
+
+  UserGetResponse:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "ユーザ名"
+        example: "錦織圭"
+  UserUpdateRequest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "ユーザ名"
+        example: "ロジャー・フェデラー"
+      email:
+        type: "string"
+        description: "メールアドレス"
+        example: "example@example.com"
+
+  AllProjectGetResponse:
+    type: "array"
+    description: "プロジェクト全件配列"
+    items:
+      type: "object"
+      properties:
+        project_id:
+          type: "integer"
+          description: "プロジェクトID"
+          example: 22
+        project_name:
+          type: "string"
+          description: "プロジェクト名"
+          example: "作って覚えよう！ソーシャルゲームの仕組み"
+        start_date:
+          type: "string"
+          description: "プロジェクト開始日"
+          example: "2019/5/3"
+        level:
+          type: "integer"
+          description: "プロジェクト推奨レベル"
+          example: 2
+        position:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              position_name:
+                type: "string"
+                description: "ポジション名"
+                example: "フロントエンド"
+              limit_num:
+                type: "integer"
+                example: "3"
+                description: "ポジションに対する空き人数"
+        skill:
+          type: "array"
+          description: "プロジェクトで得られるスキル（使う言語など）"
+          items:
+            type: "string"
+            description: "Java, PHP...などが入る"
+            example: "Java"
+        mentor:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+              example: "鈴木一郎"
+              description: "メンター名"
+        users:
+          type: "array"
+          description: "プロジェクトに登録しているユーザ"
+          items:
+            type: "object"
+            properties:
+              user_name:
+                type: "string"
+                description: "登録しているユーザ名"
+                example: "有村架純"
+  ProjectGetResponse:
+    type: "object"
+    properties:
+      project_id:
+        type: "integer"
+        description: "プロジェクトID"
+        example: 22
+      project_name:
+        type: "string"
+        description: "プロジェクト名"
+        example: "作って覚えよう！ソーシャルゲームの仕組み"
+      start_date:
+        type: "string"
+        description: "プロジェクト開始日"
+        example: "2019/5/3"
+      level:
+        type: "integer"
+        description: "プロジェクト推奨レベル"
+        example: 2
+      position:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            position_name:
+              type: "string"
+              description: "ポジション名"
+              example: "フロントエンド"
+            limit_num:
+              type: "integer"
+              example: "3"
+              description: "ポジションに対する空き人数"
+      skill:
+        type: "array"
+        description: "プロジェクトで得られるスキル（使う言語など）"
+        items:
+          type: "string"
+          description: "Java, PHP...などが入る"
+          example: "Java"
+      mentor:
+        type: "object"
+        properties:
+          name:
+            type: "string"
+            example: "鈴木一郎"
+            description: "メンター名"
+      users:
+        type: "array"
+        description: "プロジェクトに登録しているユーザ"
+        items:
+          type: "object"
+          properties:
+            user_name:
+              type: "string"
+              description: "登録しているユーザ名"
+              example: "有村架純"
+  ProjectGetRequest:
+    type: "object"
+    properties:
+      project_id:
+        type: "integer"
+        description: "ユーザ名"
+        example: 1
+
+  ErrorResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        description: "ステータスコード"
+      message:
+        type: "string"
+        description: "エラーメッセージ"
